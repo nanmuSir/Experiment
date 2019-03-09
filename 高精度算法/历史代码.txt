@@ -1,0 +1,434 @@
+#include <iostream>
+#include <stdio.h> 
+#include <stdlib.h>
+#include <string.h>
+#include<string.h>  
+#define MaxLen 200 
+using namespace std;
+		int i;
+		FILE *fpRead1,*fpRead2,*fp;
+
+    
+	//比较两个数组的大小 
+    /*int compare(int a[],int b[],int n,int m){  
+    if(n>m)return 1;//a大于b  
+    else if(n<m)return -1;//a<b  
+    else{  
+        for(i=n-1;i>=0;i++){  
+            if(a[i]>b[i])return 1;  
+            else if(a[i]<b[i])return -1;  
+        }  
+        return 0;//两个数相等   
+    }   
+}*/
+		//加法 
+	void add(int a[],int b[],int c[],int n,int m)
+	{
+			for(i=0;i<3000;i++)c[i]=0;
+		    if(n>=m)
+		{
+			for(i=0;i<m;i++)
+		    c[i]=a[i]+b[i];
+		    for(i=m;i<n;i++)c[i]+=a[i];
+	    }
+	        else
+	    {
+	    	for(i=0;i<n;i++)
+		    c[i]=a[i]+b[i];
+		    for(i=n;i<m;i++)c[i]+=b[i]; 
+		}
+		for (i = 0; i < n + m; i++) {  //进位的处理 
+		    if (c[i] >= 10) {
+				c[i + 1] += c[i] / 10;
+				c[i] %= 10;         
+			}
+		}
+		int j;
+		for ( j = 2999; j > 0; j--) {  //从后向前遍历，当最后一位不为零时，即为到达运算结果的最后一位（原数组全为0） 
+			if (c[j] != 0)
+				break;
+		}
+		fp=fopen("E:\\C++\\高精度算法\\add.txt","w");
+
+		for (i = j; i >= 0; i--) {
+			printf("%d", c[i]);
+			fprintf(fp,"%d",c[i]);
+		}
+		printf("\n");
+	} 
+		 
+		 //减法
+	 void sub(int a[],int b[],int c[],int n,int m)
+	{
+		int j;
+		for(i=0;i<3000;i++)c[i]=0;
+		if(n>=m)                          //做比较，分被减数数组大于减数数组和被减数数组小于减数数组两种情况 
+		{                                 //被减数数组大于减数数组 
+			for(i=0;i<m;i++)
+		    c[i]=a[i]-b[i];
+		    for(i=m;i<n;i++)c[i]+=a[i];
+	    }
+	    else if(n<m)                     //被减数数组小于减数数组 
+	    {
+	    	for(i=0;i<n;i++)
+		    c[i]=a[i]-b[i];
+		    for(i=n;i<m;i++)c[i]-=b[i]; 
+		}
+		for (j = 2999; j > 0; j--) {  //从后向前遍历，当最后一位不为零时，即为到达运算结果的最后一位（原数组全为0） 
+			if (c[j] != 0)
+				break;
+		}  
+		for (i = 0; i < j; i++) {  //进位的处理 
+		    if (c[i] < 0) {
+				c[i + 1] - 1;
+				c[i] += 10;         
+			}
+		}
+		for (j = 2999; j > 0; j--) {  //从后向前遍历，当最后一位不为零时，即为到达运算结果的最后一位（原数组全为0） 
+			if (c[j] != 0)
+				break;
+		}
+		for (i = j; i >= 0; i--) printf("%d", c[i]);
+		printf("\n");
+	} 
+		 
+		 //乘法
+	void multi(int a[],int b[],int c[],int n,int m)
+	{
+		int j;
+	    for (i = 0; i < 3000; i++) c[i] = 0; 
+		for (i = 0; i < n; i++) {
+			for (j = 0; j < m; j++) {
+				c[i + j] += a[i] * b[j];    //根据乘法性质来进行运算 
+			}
+		}
+		for (i = 0; i < n + m; i++) {  //进位的处理 
+			if (c[i] >= 10) {
+				c[i + 1] += c[i] / 10;
+				c[i] %= 10;         
+			}
+		}
+		for (j = 2999; j > 0; j--) {  //从后向前遍历，当最后一位不为零时，即为到达运算结果的最后一位（原数组全为0） 
+			if (c[j] != 0)
+				break;
+		}
+		for (i = j; i >= 0; i--) {    //输出语句 
+			printf("%d", c[i]);
+		}
+		printf("\n");
+	}
+	
+//函数SubStract功能：  
+//用长度为n的大整数a减去长度为m的大整数b  
+// 结果存在a中，返回值代表结果的长度  
+//不够减 返回-1 正好够 返回0  
+int SubStract( int a[], int b[], int n, int m )  
+{  
+    int i;  
+    if( n < m )  
+        return -1;  
+    if( n == m )  
+    {                        //判断a > b  
+        for( i=n-1; i>=0; i-- )  
+        {  
+            if( a[i] > b[i] )   //若大，则满足条件，可做减法  
+                break;  
+            else if( a[i] < b[i] ) //否则返回-1  
+                return -1;  
+        }  
+    }  
+    for( i=0; i<=n-1; i++ )  //从低位开始做减法  
+    {  
+        a[i] -= b[i];  
+        if( a[i] < 0 )          //若a<0，则需要借位  
+        {  
+            a[i] += 10;         //借1当10  
+            a[i+1]--;           //高位减1  
+        }  
+    }  
+    //cout<<"\n做过减法之后的a[]为：";
+    //for( i=n-1; i>=0; i-- )cout<<a[i];
+    //cout<<endl;
+    
+    for( i=n-1; i>=0; i-- )       //查找结果的最高位  
+        if( a[i] )               //最高位第一个不为0  
+            return (i+1);       //得到位数并返回  
+            
+    //cout<<"此处没有return i+1，a[]为：";
+	//for( i=n-1; i>=0; i-- )cout<<a[i];
+   // cout<<endl;
+    
+    return 0;                  //两数相等的时候返回0  
+}  
+
+    /*int qiuyu(int temp[],int b[],int c[],int n,int m)
+    {
+	    int cc[2*n],yushu[n]; 
+		for(int i=0;i<2*n;i++)cc[i]=0;
+		for(int i=0;i<n;i++)yushu[i]=0;
+	    multi(b,c,cc,m,3000);           //除数乘以商 
+	    sub(temp,cc,yushu,n,2*n);      //被除数减去乘数除以商，得到余数 
+	    return 0;
+    }*/
+    
+	//除法
+	 int divide(int a[],int b[],int c[],int n,int m)
+	 {
+	int j; 
+    int nTimes;                 //两大数相差位数  
+    int nTemp;                  //Subtract函数返回值  
+    for (i = 0; i < 3000; i++) c[i] = 0;   //结果数组全部置零
+	int temp[n];                //temp数组暂存a数组内容，用于求余数
+	for(j=0;j<n;j++)temp[j]=a[j]; 
+ 
+        if( n < m )   //如果被除数小于除数，结果为0  
+        {  
+            cout<<"0"<<endl;    
+        }  
+        nTimes = n - m;    //相差位数  
+        for ( i=n-1; i>=0; i-- )    //将除数扩大，使得除数和被除数位数相等  
+        {  
+            if ( i>=nTimes )  
+                b[i] = b[i-nTimes];  
+            else                     //低位置0  
+                b[i] = 0;  
+        }  
+        m = n;  
+        for(j=0; j<=nTimes; j++ )      //重复调用，同时记录减成功的次数，即为商  
+        {  
+            while((nTemp = SubStract(a,b + j,n,m - j)) >= 0)  
+            {  
+                n = nTemp;      //结果长度  
+                c[nTimes-j]++; //每成功减一次，将商的相应位加1  
+            }  
+        }  
+  
+        //输出结果  
+        for( i=2999; c[i]==0 && i>=0; i-- );//跳过高位0  
+        if( i>=0 ) 
+		      {
+		      	//cout<<"商为："; 
+                for( ; i>=0; i-- )  
+                cout<<c[i];
+			  }
+        else  
+            cout<<"0";  
+        cout<<endl; 
+        cout<<"余数为：";
+		for( i=n-1; i>=0; i-- )cout<<a[i];
+        cout<<endl; 
+        
+        //qiuyu(temp,b,c,n,m);
+        return 0; 
+    }  
+    
+	 //	char numberp[1500],numberq[1500];
+	 	/*cout<<"输出数组a b 中所有元素："<<endl;
+	 	for(int k=n+9;k>=0;k--)cout<<"a["<<k<<"]="<<a[k]<<"  ";cout<<endl;
+	 	for(int k=m+9;k>=0;k--)cout<<"b["<<k<<"]="<<b[k]<<"  ";cout<<endl;
+	 	cout<<"\n除法正在执行..."<<endl;*/
+	 	/*    cout<<"\nn="<<n<<"    m="<<m<<endl;
+	 	    cout<<"输出整型数数组a和b的内容：\n";
+			for(i=0;i<n;i++)cout<<" "<<a[i];
+			cout<<endl;
+			for(i=0;i<m;i++)cout<<" "<<b[i];
+			cout<<endl;
+		 
+	 	    int i,j;
+	 		for(i=0;i<3000;i++)c[i]=0;
+		    int num = 0;
+		    int flag;
+            /*if(n==m)
+			{  
+            for(int i=n-1; i>=0; i--) 
+                if(a[i] < b[i]) {flag=false;cout<<"第一步：flag=false"<<endl;break;}   //数组a小于数组b的对应元素 
+                else if(a[i] > b[i]) {flag=true;cout<<"第二步：flag=true"<<endl;break;}  //数组a大于数组b的对应元素 
+                else 
+				{ 
+				    cout<<"第三步：两数相等"<<endl;
+				    cout<<"两数相等，商为1，余数为0";
+				    return 0;  
+                }  
+            }*/
+			/*if(n<m)
+			{
+				cout<<"第四步：被除数小于除数"<<endl;
+				cout<<"被除数小于除数！\n余数为：";
+				for (i = j; i >= 0; i--)printf("%d", a[i]); 
+				return -1;
+			}  */
+		/*	if(compare(a,b,n,m)==1)flag=1;
+    	    else if(compare(a,b,n,m)==-1){
+			    cout<<"被除数小于除数！商为0\n余数为：";
+				for (i = n-1; i >= 0; i--)printf("%d", a[i]); 
+				return -1;}
+    	    else if(compare(a,b,n,m)==0){cout<<"两数相等，商为1，余数为0";return 0;}
+			
+			//除法过程                    
+            while(flag==1)
+            {
+            	cout<<"while循环刚开始"<<endl;
+                for(i=0;i<m;i++)   //减法过程 
+		        a[i]=c[i]=a[i]-b[i];
+		        for(i=m;i<n;i++)c[i]+=a[i];
+		    
+    	/*	for (p = n-1; p > 0; p--) 
+			{  //从后向前遍历，当最后一位不为零时，即为到达运算结果的最后一位（原数组全为0）
+			if (a[p] != 0){cout<<"a去除全部的0，p="<<p<<"     a[p]="<<a[p]<<endl;
+			//for(int k=p;k>=0;k--)cout<<"a["<<k<<"]="<<a[k]<<"  ";
+			break;}
+	    	} 
+			for (q = m-1; q > 0; q--) 
+			{  //从后向前遍历，当最后一位不为零时，即为到达运算结果的最后一位（原数组全为0）
+			if (b[q] != 0){cout<<"b去除全部的0，q="<<q<<"     b[q]="<<b[q]<<endl;
+			//for(int k=q;k>=0;k--)cout<<"b["<<k<<"]="<<b[k]<<"  ";
+			break;}
+	    	}   
+    	    if(p<q)flag=false;
+    	    */
+    	    /*for (i = 0, j = n - 1; i < n; i++, j--) //将整型数数组转换为字符数组 
+			{numberp[i] = a[j] + '0'; a[j]=numberp[i]-'0';}
+	    	//for (i = 0, j = m - 1; i < m; i++, j--) //将整型数数组转换为字符数组 
+			//numberq[i] = b[j] + '0';
+			n = strlen(numberp); //m = strlen(numberq);
+			cout<<"\nn="<<n<<"    m="<<m<<endl;
+			*/
+		/*	cout<<"输出整型数数组a和b的内容：\n";
+			for(i=0;i<n;i++)cout<<" "<<a[i];
+			cout<<endl;
+			for(i=0;i<m;i++)cout<<" "<<b[i];
+			cout<<endl;
+			
+		/*	cout<<"输出字符数组numberp和numberq的内容：\n";
+			for(i=0;i<n;i++)cout<<" "<<numberp[i];
+			cout<<endl;
+			for(i=0;i<m;i++)cout<<" "<<numberq[i];
+			cout<<endl;
+			cout<<"n="<<n<<"  m="<<m<<endl;
+			*/
+    	/*    if(compare(c,b,n,m)==1||compare(c,b,n,m)==0)flag=1;
+    	    else if(compare(c,b,n,m)==-1){flag=0;break;}
+    	    /*else if(compare(c,b,n,m)==0){cout<<"商为"<<num<<"余数为:";
+			     for (i = m-1; i >= 0; i--)printf("%d", b[i]);return 0;}*/
+    		/*if(n==m) 
+			 {    
+			    cout<<"while中对flag重赋值"<<endl;
+                for(int i=n; i>=1; i--) 
+                if(a[i] < b[i]) {flag=false;break;}   //数组a小于数组b的对应元素 
+                else if(a[i] > b[i]) {flag=true;break;}  //数组a大于数组b的对应元素 
+                else 
+				{ 
+				    cout<<"两数相等，商为1，余数为0";
+				    return 0;  
+                } 
+	         }*/
+	    /*     num++; 
+	    	 }
+	    	 
+    		for (j = 2999; j > 0; j--) 
+			{  //从后向前遍历，当最后一位不为零时，即为到达运算结果的最后一位（原数组全为0） 
+			if (c[j] != 0){cout<<"c去除全部的0，j="<<j<<endl;
+			break;}
+	    	}  
+		    for (i = 0; i < j; i++)
+			{  //进位的处理 
+		    if (c[i] < 0) 
+			{
+				c[i + 1] - 1;
+				c[i] += 10;         
+			}
+		    }
+		    cout<<"结束除法过程"<<endl;
+		cout<<"商为："<<num+1<<endl;
+		//cout<<num+1<<endl;
+		cout<<"余数为：";
+		for (i = j; i >= 0; i--)printf("%d", c[i]);
+		printf("\n");
+		return 0;*/
+	 
+
+		 
+int main(int argc, char** argv) {
+
+    char numberN[1500], numberM[1500];//创建两个数组来存放运算数据 
+	//文件读取，存入数组中 
+	fpRead1 = fopen("E:\\C++\\高精度算法\\data1.txt", "r");
+	if (fpRead1 == NULL){  
+        cout<<"Open File Failed."<<endl;  
+        exit(0);  
+    } 
+    //得到文件内数据的长度 
+    fseek(fpRead1,0,SEEK_SET);
+    fseek(fpRead1,0,SEEK_END);
+    long length1=ftell(fpRead1);// length1就是文件的长度
+    //cout<<"length1="<<length1<<endl;
+    
+    fseek(fpRead1,0,SEEK_SET);     //文件流位置放到开头
+    //fgets(numberN,length1,fpRead1);    //读取一整行数据 
+    //cout<<"ch="<<ch<<endl;
+	for(i=0;i<length1;i++){   
+	    fscanf(fpRead1, "%s", &numberN[i]); //读取单个数据
+        //cout<<"Line:"<< numberN[i]<<endl;  
+    }  	
+    
+    fpRead2 = fopen("E:\\C++\\高精度算法\\data2.txt", "r");
+    if (fpRead2 == NULL){  
+        cout<<"Open File failed.\n";  
+        exit(0);  
+    } 
+    //得到文件内数据的长度 
+    fseek(fpRead2,0,SEEK_SET);
+    fseek(fpRead2,0,SEEK_END);
+    long length2=ftell(fpRead2);// length2就是文件的长度
+    //cout<<"length2="<<length2<<endl;
+    
+    fseek(fpRead2,0,SEEK_SET);  //文件流位置放到开头 
+	for(i=0;i<length2;i++){  
+    fscanf(fpRead2, "%s", &numberM[i]);  //读取单个数据
+    //cout<<"Line:"<< numberM[i]<<endl;  
+    }  	
+		//scanf("%s%s", numberN, numberM);
+		int n = strlen(numberN), m = strlen(numberM);
+		int a[n], b[m];              //两个和数据等长的中间数组 
+		int i, j;
+		for (i = 0, j = n - 1; i < n; i++, j--) {//将字符数组转换为整型数数组 
+			a[i] = numberN[j] - '0';
+		}
+		for (i = 0, j = m - 1; i < m; i++, j--) {//将字符数组转换为整型数数组 
+			b[i] = numberM[j] - '0';
+		}
+		int c[3000];          //结果数组 
+		
+		//输出数组a b 的内容 
+		cout<<"a为：";
+		for(i=n-1;i>=0;i--)cout<<a[i];
+		cout<<endl;
+		cout<<"b为：";
+		for(i=m-1;i>=0;i--)cout<<b[i];
+		cout<<endl<<endl;
+		
+	cout<<"a+b=";
+	add(a,b,c,n,m);
+	cout<<endl;
+	
+	cout<<"a-b=";
+	sub(a,b,c,n,m);
+	cout<<endl;
+	
+	cout<<"a*b=";
+	multi(a,b,c,n,m);
+	cout<<endl;
+	
+	cout<<"a/b=";
+	divide(a,b,c,n,m);
+	cout<<endl;
+	
+	system("pause");
+	return 0;
+}
+
+
+
+template<class T>
+void AdvancedOperation<T>::add(int a[],int b[],int c[],int n,int m)
+
